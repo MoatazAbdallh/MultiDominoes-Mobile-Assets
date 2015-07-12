@@ -44,8 +44,23 @@ var app = angular.module('Dominoes', ['ionic', 'ionic.contrib.ui.tinderCards'
     // Override the Android platform default to add "tabs-striped" class to "ion-tabs" elements.
     $ionicTabsConfig.type = '';
 }]);
-app.run(['$ionicBackdrop', '$rootScope', function ($ionicBackdrop, $rootScope) {
+app.run(['$ionicBackdrop', '$rootScope', '$ionicPlatform', function ($ionicBackdrop, $rootScope, $ionicPlatform) {
     $rootScope.backDrop = $ionicBackdrop;
+    var backButton = 0;
+    $ionicPlatform.ready(function () {
+        $ionicPlatform.registerBackButtonAction(function (e) {
+            e.preventDefault();
+            e.stopPropagation()
+            if (backButton == 0) {
+                backButton++;
+                NativeBridge.toastshort("Press back again to exit");
+                setTimeout(function () { backButton = 0; }, 5000);
+            }
+            else
+                navigator.app.exitApp();
+        }, 100);
+    })
+   
 }])
 app.controller('discoverController', ['$scope', '$ionicModal', '$ionicLoading', '$rootScope', '$state', function ($scope, $ionicModal, $ionicLoading, $rootScope, $state) {
     require(['js/controllers/discoverController'], function (discover) {
@@ -75,16 +90,6 @@ app.controller('mainController', ['$scope', '$ionicPopup', '$ionicBackdrop', '$i
 
 
 document.addEventListener('deviceready', function () {
-    var backbutton = 0;
-    document.addEventListener("backbutton", function () {
-        if (backbutton == 0) {
-            backbutton++;
-            NativeBridge.toastshort("Press back again to exit");
-            setTimeout(function () { backbutton = 0; }, 5000);
-        }
-        else
-            navigator.app.exitApp();
-    }, false);
     onDeviceReady()
 }, false);
 
