@@ -15,6 +15,12 @@
         else
             NativeBridge.alert(message);
     },
+    toastlong: function (message) {
+        if (window.plugins && window.plugins.toast)
+            window.plugins.toast.showLongBottom(message);
+        else
+            NativeBridge.alert(message);
+    },
     closeApp: function () {
         if (navigator.app)
             navigator.app.exit();

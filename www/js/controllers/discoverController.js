@@ -21,8 +21,8 @@
             $ionicLoading.hide();
         }
         $scope.onError = function (err) {
-            $scope.hideLoading();
-            if (err.message.indexOf("CORS") > 0)
+        	$scope.hideLoading();
+            if (err.message.indexOf("CORS") > -1)
                 NativeBridge.alert("Please Check your network connection", null, "Warning");
             else
             NativeBridge.alert(err.message);
@@ -51,15 +51,18 @@
 
         }
         $scope.selectDevice = function (device) {
+        	console.log(device)
             $scope.showNormalLoading();
             $scope.selectedDevice = device;
             $scope.selectedDevice.getApplication("MultiDominoes", $scope.onGetApplication, $scope.onError);
         }
         $scope.onGetApplication = function (application) {
+        	console.log(application)
             $scope.application = application;
             if ($scope.application.lastKnownStatus !== "running") {
                 $scope.application.launch({ "launcher": "Mobile-Dominoes" }, $scope.onLaunchSuccess, $scope.onError);
             } else {
+            	//console.log($scope.selectedDevice)
                 $scope.selectedDevice.connectToChannel($scope.channelId, { name: $scope.gameSettings.playerName }, $scope.onConnect, $scope.onError);
             }
         }
