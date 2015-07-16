@@ -4,9 +4,12 @@
         $rootScope.target = "host";
         var stringOnlyRegx = /^[A-Za-z0-9]+$/;
         $scope.gameSettings = {};
+        $scope.gameSettings.uuid = NativeBridge.guid();
         $scope.loc = $('html').injector().get("$location");
         $rootScope.connectionMsgs = [];
         $('.backdrop').css('visibility', 'hidden');
+        cordova.plugins.Keyboard.disableScroll(true);
+
         $scope.showLoading = function (msg) {
             $ionicLoading.show({
                 template: '<img src="img/loading-large.gif" /><br/><h1>' + msg + '...</h1>'
@@ -21,11 +24,11 @@
             $ionicLoading.hide();
         }
         $scope.onError = function (err) {
-        	$scope.hideLoading();
+            $scope.hideLoading();
             if (err.message.indexOf("CORS") > -1)
                 NativeBridge.alert("Please Check your network connection", null, "Warning");
             else
-            NativeBridge.alert(err.message);
+                NativeBridge.alert(err.message);
         }
 
 
@@ -51,25 +54,25 @@
 
         }
         $scope.selectDevice = function (device) {
-        	console.log(device)
+            //console.log(device)
             $scope.showNormalLoading();
             $scope.selectedDevice = device;
             $scope.selectedDevice.getApplication("MultiDominoes", $scope.onGetApplication, $scope.onError);
         }
         $scope.onGetApplication = function (application) {
-        	console.log(application)
+            //console.log(application)
             $scope.application = application;
             if ($scope.application.lastKnownStatus !== "running") {
                 $scope.application.launch({ "launcher": "Mobile-Dominoes" }, $scope.onLaunchSuccess, $scope.onError);
             } else {
-            	//console.log($scope.selectedDevice)
-                $scope.selectedDevice.connectToChannel($scope.channelId, { name: $scope.gameSettings.playerName }, $scope.onConnect, $scope.onError);
+                //console.log($scope.selectedDevice)
+                $scope.selectedDevice.connectToChannel($scope.channelId, { name: $scope.gameSettings.playerName, uuid: $scope.gameSettings.uuid }, $scope.onConnect, $scope.onError);
             }
         }
         $scope.onLaunchSuccess = function (application) {
             console.log("App Has Been Launched");
             setTimeout(function () {
-                $scope.selectedDevice.connectToChannel($scope.channelId, { name: $scope.gameSettings.playerName }, $scope.onConnect, $scope.onError);
+                $scope.selectedDevice.connectToChannel($scope.channelId, { name: $scope.gameSettings.playerName, uuid: $scope.gameSettings.uuid }, $scope.onConnect, $scope.onError);
             }, 5000)
         }
         $scope.onConnect = function (channel) {
@@ -81,28 +84,32 @@
             $rootScope.channel.on("disconnect", function (myClient) {
                 $rootScope.channel = null;
                 NativeBridge.toastshort("Disconnected from channel, please discover again");
+                $rootScope.channel.send(JSON.stringify({ type: "message", content: "Disconnected from game" }), $rootScope.target);
                 $rootScope.startFlag = false;
                 $scope.hideLoading();
+                $scope.modal2.hide();
                 $scope.modal.hide();
                 $state.go('discover');
             });
 
             $rootScope.channel.on("clientConnect", function (client) {
-                $state.go('waiting');
+                if (client.attributes.uuid == $scope.gameSettings.uuid)
+                    $state.go('waiting');
             });
 
             $rootScope.channel.on("clientDisconnect", function (client) {
                 console.log(client.attributes.name + " has been disconnected");
             });
 
-            $rootScope.channel.on("message", function (msg, client) {
+            $rootScope.channel.on("message", function (msg, tvSide) {
                 $scope.hideLoading();
                 $scope.data = JSON.parse(msg);
                 if ($scope.data.type == "connection" && $scope.data.flag == true) {
                     NativeBridge.toastshort($scope.data.message);
                     $rootScope.playersLength = $scope.data.playerslength;
                     if ($state.$current != 'waiting') //in case clientConnect event not fired
-                        $state.go('waiting');
+                        if ($scope.data.uuid == $scope.gameSettings.uuid)
+                            $state.go('waiting');
                 }
                 if ($scope.data.type == "readyToPlay" && $scope.data.flag == true) {
                     $scope.hideLoading();
@@ -124,11 +131,8 @@
                     if ($scope.data.content.indexOf("Sorry we have reached max. number of players") > -1)
                         NativeBridge.closeApp();
                     if ($scope.data.content.indexOf("has been disconnected") > -1) {
-                        //$rootScope.channel.disconnect(function () {
-                        //    NativeBridge.toastshort("Disconnected from channel, please discover again");
-                        //    $rootScope.startFlag = false;
-                        //})
                         $scope.hideLoading();
+                        $rootScope.modal2.hide();
                         $scope.modal.hide();
                         $state.go('discover');
 

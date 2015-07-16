@@ -1,14 +1,15 @@
 ﻿define(function () {
-    return function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal) {
+    return function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal, $ionicPlatform) {
+        var backButton = 0;
         $ionicModal.fromTemplateUrl('views/swipe.html', {
             scope: $scope,
             animation: 'slide-in-up'
         }).then(function (modal) {
-            $scope.modal = modal;
+            $rootScope.modal2 = modal;
             $scope.showLeftImage = true;
             $scope.showRightImage = true;
             $scope.swipeCount = 0;
-            $scope.modal.show();
+            $rootScope.modal2.show();
 
         });
         $scope.showNormalLoading = function () {
@@ -29,7 +30,7 @@
                 NativeBridge.toastshort("Swipe in the other direction");
         }
         $scope.getScreenWidth = function () {
-            console.log("Screen Width "+ window.innerWidth)
+            //console.log("Screen Width "+ window.innerWidth)
             return window.innerWidth;
         }
         $scope.detectCard = function (card) {
@@ -77,11 +78,11 @@
         });
         $scope.$watch('showLeftImage', function (newValues, oldValues) {
             if (newValues==false && !$scope.showRightImage)
-                $scope.modal.hide();
+                $rootScope.modal2.hide();
         });
         $scope.$watch('showRightImage', function (newValues, oldValues) {
             if (newValues==false && !$scope.showLeftImage)
-                $scope.modal.hide();
+                $rootScope.modal2.hide();
         });
         $scope.drawCard = function () {
             $rootScope.cardsDisabledFlag = true; //disable UI until you get response from TV
@@ -92,5 +93,20 @@
             $rootScope.channel.send(JSON.stringify({ type: "yPassTurn" }), $rootScope.target);
 
         }
+
+        $ionicPlatform.registerBackButtonAction(function (e) {
+            e.preventDefault();
+            e.stopPropagation()
+            if (backButton == 0) {
+                backButton++;
+                NativeBridge.toastshort("Press back again to exit");
+                setTimeout(function () { backButton = 0; }, 5000);
+            }
+            else {
+                $rootScope.channel.send(JSON.stringify({ type: "message", content:"Disconnected from game"}), $rootScope.target);
+                navigator.app.exitApp();
+            }
+                
+        }, 200);
     }
 })

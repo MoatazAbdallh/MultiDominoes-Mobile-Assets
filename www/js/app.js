@@ -82,9 +82,9 @@ app.controller('loserController', ['$scope', '$ionicLoading', '$rootScope', '$st
         loser($scope, $ionicLoading, $rootScope, $state)
     })
 }])
-app.controller('mainController', ['$scope', '$ionicPopup', '$ionicBackdrop', '$ionicLoading', '$rootScope', '$ionicModal', function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal) {
+app.controller('mainController', ['$scope', '$ionicPopup', '$ionicBackdrop', '$ionicLoading', '$rootScope', '$ionicModal', '$ionicPlatform', function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal, $ionicPlatform) {
     require(['js/controllers/mainController'], function (main) {
-        main($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal)
+        main($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal, $ionicPlatform)
     })
 }])
 
