@@ -1,5 +1,5 @@
 ﻿define(function () {
-    return function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal, $ionicPlatform) {
+    return function ($scope, $ionicPopup, $ionicBackdrop, $ionicLoading, $rootScope, $ionicModal, $ionicPlatform, $window) {
         var backButton = 0;
         $ionicModal.fromTemplateUrl('views/swipe.html', {
             scope: $scope,
@@ -94,19 +94,5 @@
 
         }
 
-        $ionicPlatform.registerBackButtonAction(function (e) {
-            e.preventDefault();
-            e.stopPropagation()
-            if (backButton == 0) {
-                backButton++;
-                NativeBridge.toastshort("Press back again to exit");
-                setTimeout(function () { backButton = 0; }, 5000);
-            }
-            else {
-                $rootScope.channel.send(JSON.stringify({ type: "message", content:"Disconnected from game"}), $rootScope.target);
-                navigator.app.exitApp();
-            }
-                
-        }, 200);
     }
 })
