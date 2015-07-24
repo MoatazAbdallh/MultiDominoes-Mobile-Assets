@@ -84,10 +84,11 @@
             $rootScope.channel.on("disconnect", function (myClient) {
                 $rootScope.channel = null;
                 NativeBridge.toastshort("Disconnected from channel, please discover again");
-                $rootScope.channel.send(JSON.stringify({ type: "message", content: "Disconnected from game" }), $rootScope.target);
-                $rootScope.startFlag = false;
+                //$rootScope.channel.send(JSON.stringify({ type: "message", content: "Disconnected from game" }), $rootScope.target);
+                //$rootScope.startFlag = false;
                 $scope.hideLoading();
-                $scope.modal2.hide();
+                if ($rootScope.modal2)
+                    $rootScope.modal2.hide();
                 $scope.modal.hide();
                 $state.go('discover');
             });
@@ -132,7 +133,8 @@
                         NativeBridge.closeApp();
                     if ($scope.data.content.indexOf("has been disconnected") > -1) {
                         $scope.hideLoading();
-                        $rootScope.modal2.hide();
+                        if ($rootScope.modal2)
+                            $rootScope.modal2.hide();
                         $scope.modal.hide();
                         $state.go('discover');
 
