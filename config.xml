@@ -29,6 +29,7 @@
     <feature name="Toast">
         <param name="android-package" value="nl.xservices.plugins.Toast" />
     </feature>
+    <preference name="Orientation" value="landscape" />
 	<platform name="android">
     <preference name="AndroidLaunchMode" value="singleTop"/>
 <preference name="android-minSdkVersion" value="15"/>
