@@ -160,9 +160,10 @@
       var duration = 0.3 - Math.min(Math.max(Math.abs(e.gesture.velocityX)/10, 0.05), 0.2);
       
       ionic.requestAnimationFrame(function() {
-        console.log(targetX+' ' +targetY + ' '+ self.rotationAngle);
+        //console.log(targetX+' ' +targetY + ' '+ self.rotationAngle);
+        self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + 0 + 'px, ' + 0 + 'px,0) rotate(' + self.rotationAngle + 'rad)';
         
-        self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + 0+ 'px, ' +0 + 'px,0) rotate(' + self.rotationAngle + 'rad)';
+        //self.el.style.transform = self.el.style.webkitTransform = 'translate3d(' + targetX + 'px, ' + targetY + 'px,0) rotate(' + self.rotationAngle + 'rad)';
         self.el.style.transition = self.el.style.webkitTransition = 'all ' + duration + 's ease-in-out';
       });
 
